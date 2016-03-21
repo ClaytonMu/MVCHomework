@@ -26,7 +26,7 @@ namespace MVCHomework1.Controllers
         [HttpPost]
         public ActionResult Index(string keyword)
         {
-            var 客戶銀行資訊 = db.客戶銀行資訊.Include(客 => 客.客戶資料);
+            var 客戶銀行資訊 = db.客戶銀行資訊.Include(客 => 客.客戶資料).AsQueryable();
 
             客戶銀行資訊 = 客戶銀行資訊.Where(客 =>
                 (客.銀行名稱.Contains(keyword) ||
