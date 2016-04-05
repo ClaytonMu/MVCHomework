@@ -6,16 +6,17 @@
 
 <h2>Index</h2>
 
-<p>
+
     @Html.ActionLink("Create New", "Create")
     @using (Html.BeginForm())
     {
-    <p>
-        Keyword: @Html.TextBox("keyword")
-        <input type="submit" value="查詢" />
-    </p>
+        <p>
+            Keyword: @Html.TextBox("keyword")
+            <input type="submit" value="查詢" />
+            @Html.Partial("_ExportToExcelPartial")
+        </p>
     }
-</p>
+
 <table class="table">
     <tr>
         <th>

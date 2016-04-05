@@ -7,37 +7,41 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using MVCHomework1.Models;
+using NPOI;
+using NPOI.HSSF.UserModel;
+using NPOI.XSSF.UserModel;
+using NPOI.SS.UserModel;
+using System.IO;
+using System.Reflection;
 
 namespace MVCHomework1.Controllers
 {
     public class 客戶資料Controller : Controller
     {
-        private 客戶資料Entities db = new 客戶資料Entities();
 
+        private 客戶資料Repository _客戶資料Repository = RepositoryHelper.Get客戶資料Repository();
+        private 客戶聯絡人Repository _客戶聯絡人Repository = RepositoryHelper.Get客戶聯絡人Repository();
+        private VW_客戶聯絡人帳戶數量Repository _VW_客戶聯絡人帳戶數量Repository = RepositoryHelper.GetVW_客戶聯絡人帳戶數量Repository();
         // GET: 客戶資料
         public ActionResult Index()
         {
-            var 客戶資料 = db.客戶資料.AsQueryable();
+            var 客戶資料 = _客戶資料Repository.All();
 
-            客戶資料 = 客戶資料.Where(客 => 客.是否已刪除 == false);
             return View(客戶資料.ToList());
         }
 
         [HttpPost]
         public ActionResult Index(string keyword)
         {
-            var 客戶資料 = db.客戶資料.AsQueryable();
-
-            客戶資料 = 客戶資料.Where(客 => 
-                (客.客戶名稱.Contains(keyword) ||
-                客.統一編號.Contains(keyword) ||
-                客.電話.Contains(keyword) ||
-                客.傳真.Contains(keyword) ||
-                客.地址.Contains(keyword) ||
-                客.Email.Contains(keyword)) &&
-                客.是否已刪除 == false);
+            var 客戶資料 = _客戶資料Repository.SearchAll(keyword);
 
             return View(客戶資料.ToList());
+        }
+
+        public ActionResult ExportToExcel()
+        {
+            byte[] info = _客戶資料Repository.ExportToExcel();
+            return File(info, "application/vnd.ms-excel", "Download.xls");
         }
 
         // GET: 客戶資料/Details/5
@@ -47,7 +51,7 @@ namespace MVCHomework1.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            客戶資料 客戶資料 = db.客戶資料.Find(id);
+            客戶資料 客戶資料 = _客戶資料Repository.Find(id.Value);
             if (客戶資料 == null)
             {
                 return HttpNotFound();
@@ -58,6 +62,7 @@ namespace MVCHomework1.Controllers
         // GET: 客戶資料/Create
         public ActionResult Create()
         {
+            ViewBag.類別Id = new SelectList(_客戶資料Repository.所有客戶類別(), "Key", "Value");
             return View();
         }
 
@@ -70,12 +75,42 @@ namespace MVCHomework1.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.客戶資料.Add(客戶資料);
-                db.SaveChanges();
+                _客戶資料Repository.Add(客戶資料);
+                _客戶資料Repository.UnitOfWork.Commit();
                 return RedirectToAction("Index");
             }
 
+            ViewBag.類別Id = new SelectList(_客戶資料Repository.所有客戶類別(), "Key", "Value");
             return View(客戶資料);
+        }
+
+        public ActionResult GetContracterPartial(IList<客戶聯絡人> 客戶聯絡人)
+        {
+            //客戶聯絡人Repository 客戶聯絡人Repository = RepositoryHelper.Get客戶聯絡人Repository();
+            return PartialView("_IndexPartial", 客戶聯絡人);
+        }
+
+        [HttpPost]
+        public ActionResult EditPartial(IList<客戶聯絡人ViewModel> data)
+        {
+            if (ModelState.IsValid)
+            {
+                foreach (var item in data)
+                {
+                    var 客戶聯絡人 = _客戶聯絡人Repository.Find(item.Id);
+                    客戶聯絡人.職稱 = item.職稱;
+                    客戶聯絡人.電話 = item.電話;
+                    客戶聯絡人.手機 = item.手機;
+                }
+
+                _客戶聯絡人Repository.UnitOfWork.Commit();
+                return RedirectToAction("Index");
+            }
+            else
+            {
+                return RedirectToAction("Index");
+            }
+            //return PartialView("_IndexPartial", _客戶資料Repository.Find(id));
         }
 
         // GET: 客戶資料/Edit/5
@@ -85,11 +120,13 @@ namespace MVCHomework1.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            客戶資料 客戶資料 = db.客戶資料.Find(id);
+            客戶資料 客戶資料 = _客戶資料Repository.Find(id.Value);
             if (客戶資料 == null)
             {
                 return HttpNotFound();
             }
+
+            ViewBag.類別Id = new SelectList(_客戶資料Repository.所有客戶類別(), "Key", "Value");
             return View(客戶資料);
         }
 
@@ -98,14 +135,16 @@ namespace MVCHomework1.Controllers
         // 詳細資訊，請參閱 http://go.microsoft.com/fwlink/?LinkId=317598。
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit([Bind(Include = "Id,客戶名稱,統一編號,電話,傳真,地址,Email")] 客戶資料 客戶資料)
+        public ActionResult Edit([Bind(Include = "Id,客戶名稱,統一編號,電話,傳真,地址,Email,客戶類別,客戶聯絡人")] 客戶資料 客戶資料)
         {
             if (ModelState.IsValid)
             {
-                db.Entry(客戶資料).State = EntityState.Modified;
-                db.SaveChanges();
+                _客戶資料Repository.UnitOfWork.Context.Entry(客戶資料).State = EntityState.Modified;
+                _客戶資料Repository.UnitOfWork.Commit();
                 return RedirectToAction("Index");
             }
+
+            ViewBag.類別Id = new SelectList(_客戶資料Repository.所有客戶類別(), "Key", "Value");
             return View(客戶資料);
         }
 
@@ -116,7 +155,7 @@ namespace MVCHomework1.Controllers
             {
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
-            客戶資料 客戶資料 = db.客戶資料.Find(id);
+            客戶資料 客戶資料 = _客戶資料Repository.Find(id.Value);
             if (客戶資料 == null)
             {
                 return HttpNotFound();
@@ -130,28 +169,28 @@ namespace MVCHomework1.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(int id)
         {
-            客戶資料 客戶資料 = db.客戶資料.Find(id);
+            客戶資料 客戶資料 = _客戶資料Repository.Find(id);
 
-            db.客戶銀行資訊.Where(客 => 客.客戶Id == id)?.ToList().ForEach(客 => { 客.是否已刪除 = true; });
-            db.客戶聯絡人.Where(客 => 客.客戶Id == id)?.ToList().ForEach(客 => { 客.是否已刪除 = true; });
-            客戶資料.是否已刪除 = true;
+            _客戶資料Repository.Delete(客戶資料);
 
-            db.SaveChanges();
+            _客戶資料Repository.UnitOfWork.Commit();
             return RedirectToAction("Index");
         }
 
         public ActionResult 客戶聯絡人銀行帳戶數量()
         {
-            return View(db.VW_客戶聯絡人帳戶數量.ToList());
+            return View(_VW_客戶聯絡人帳戶數量Repository.All().ToList());
         }
 
         protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
-                db.Dispose();
+                _客戶資料Repository.UnitOfWork.Context.Dispose();
             }
             base.Dispose(disposing);
         }
     }
 }
+
+

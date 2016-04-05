@@ -2,8 +2,9 @@ namespace MVCHomework1.Models
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.ComponentModel.DataAnnotations;
-    
+
     [MetadataType(typeof(客戶資料MetaData))]
     public partial class 客戶資料
     {
@@ -37,7 +38,10 @@ namespace MVCHomework1.Models
         public string Email { get; set; }
         [Required]
         public bool 是否已刪除 { get; set; }
-    
+
+        [StringLength(50, ErrorMessage = "欄位長度不得大於 50 個字元")]
+        public string 客戶類別 { get; set; }
+
         public virtual ICollection<客戶銀行資訊> 客戶銀行資訊 { get; set; }
         public virtual ICollection<客戶聯絡人> 客戶聯絡人 { get; set; }
     }
