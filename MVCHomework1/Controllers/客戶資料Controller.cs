@@ -22,6 +22,12 @@ namespace MVCHomework1.Controllers
         private 客戶資料Repository _客戶資料Repository = RepositoryHelper.Get客戶資料Repository();
         private 客戶聯絡人Repository _客戶聯絡人Repository = RepositoryHelper.Get客戶聯絡人Repository();
         private VW_客戶聯絡人帳戶數量Repository _VW_客戶聯絡人帳戶數量Repository = RepositoryHelper.GetVW_客戶聯絡人帳戶數量Repository();
+
+        public ActionResult TestError()
+        {
+            throw new ArgumentException("錯誤");
+        }
+
         // GET: 客戶資料
         public ActionResult Index(string sortOrder = "", string keyword = "")
         {
@@ -78,17 +84,11 @@ namespace MVCHomework1.Controllers
             }
             else
             {
-                //客戶聯絡人 = _客戶聯絡人Repository.All().OrderBy(p => p.姓名);
                 ViewBag.SortOrder = "ASC";
                 ViewBag.Keyword = "";
-                //return View(客戶聯絡人.ToList());
             }
 
             return View(客戶資料.ToList());
-
-            //var 客戶資料 = _客戶資料Repository.All();
-            
-            //return View(客戶資料.ToList());
         }
 
         [HttpPost]

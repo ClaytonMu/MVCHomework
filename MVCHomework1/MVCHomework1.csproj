@@ -380,6 +380,7 @@
     <Content Include="Views\Shared\_IndexPartial.cshtml" />
     <Content Include="Views\Shared\_ExportToExcelPartial.cshtml" />
     <Content Include="Views\客戶聯絡人\_IndexPartialView.cshtml" />
+    <Content Include="Views\Shared\CustomError.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

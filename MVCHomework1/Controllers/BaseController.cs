@@ -6,6 +6,7 @@ using System.Web.Mvc;
 
 namespace MVCHomework1.Controllers
 {
+    [HandleError(ExceptionType = typeof(ArgumentException), View = "CustomError")]
     [CalcActionTimespan]
     public class BaseController : Controller
     {

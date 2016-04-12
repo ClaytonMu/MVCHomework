@@ -16,6 +16,7 @@ namespace MVCHomework1.Controllers
             var sp = DateTime.Now - (DateTime)filterContext.Controller.ViewBag.dtStart;
             filterContext.Controller.ViewBag.timespan = sp;
             base.OnActionExecuted(filterContext);
+            System.Diagnostics.Debug.Print(sp.ToString());
         }
     }
 }
