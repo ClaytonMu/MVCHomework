@@ -20,22 +20,22 @@
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.銀行名稱)
+            @Html.ActionLink("銀行名稱", "Index", new { sortOrder = "銀行名稱_" + ViewBag.SortOrder, keyword = ViewBag.Keyword })
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.銀行代碼)
+            @Html.ActionLink("銀行代碼", "Index", new { sortOrder = "銀行代碼_" + ViewBag.SortOrder, keyword = ViewBag.Keyword })
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.分行代碼)
+            @Html.ActionLink("分行代碼", "Index", new { sortOrder = "分行代碼_" + ViewBag.SortOrder, keyword = ViewBag.Keyword })
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.帳戶名稱)
+            @Html.ActionLink("帳戶名稱", "Index", new { sortOrder = "帳戶名稱_" + ViewBag.SortOrder, keyword = ViewBag.Keyword })
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.帳戶號碼)
+            @Html.ActionLink("帳戶號碼", "Index", new { sortOrder = "帳戶號碼_" + ViewBag.SortOrder, keyword = ViewBag.Keyword })
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.客戶資料.客戶名稱)
+            @Html.ActionLink("客戶名稱", "Index", new { sortOrder = "客戶名稱_" + ViewBag.SortOrder, keyword = ViewBag.Keyword })
         </th>
         <th></th>
     </tr>

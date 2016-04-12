@@ -70,6 +70,11 @@
                 @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
             </div>
         </div>
+
+        <div>
+            <h4>客戶聯絡人</h4>
+            @Html.Partial("_IndexPartial", Model.客戶聯絡人.Where(p => p.是否已刪除 == false))
+        </div>
         <input type="submit" value="Save" class="btn btn-default" />
 
         
@@ -81,10 +86,7 @@
     
 }
 
-<div>
-    <h4>客戶聯絡人</h4>
-    @Html.Partial("_IndexPartial", Model.客戶聯絡人.Where(p => p.是否已刪除 == false))
-</div>
+
 
 <div>
     @Html.ActionLink("Back to List", "Index")

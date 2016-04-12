@@ -42,25 +42,25 @@
     <table class="table">
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.客戶名稱)
+                @Html.ActionLink("客戶名稱", "Index", new { sortOrder = "客戶名稱_" + ViewBag.SortOrder, keyword = ViewBag.Keyword })
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.統一編號)
+                @Html.ActionLink("統一編號", "Index", new { sortOrder = "統一編號_" + ViewBag.SortOrder, keyword = ViewBag.Keyword })
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.電話)
+                @Html.ActionLink("電話", "Index", new { sortOrder = "電話_" + ViewBag.SortOrder, keyword = ViewBag.Keyword })
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.傳真)
+                @Html.ActionLink("傳真", "Index", new { sortOrder = "傳真_" + ViewBag.SortOrder, keyword = ViewBag.Keyword })
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.地址)
+                @Html.ActionLink("地址", "Index", new { sortOrder = "地址_" + ViewBag.SortOrder, keyword = ViewBag.Keyword })
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Email)
+                @Html.ActionLink("Email", "Index", new { sortOrder = "Email_" + ViewBag.SortOrder, keyword = ViewBag.Keyword })
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.客戶類別)
+                @Html.ActionLink("客戶類別", "Index", new { sortOrder = "客戶類別_" + ViewBag.SortOrder, keyword = ViewBag.Keyword })
             </th>
             <th></th>
         </tr>

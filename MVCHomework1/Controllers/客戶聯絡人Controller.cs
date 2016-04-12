@@ -13,24 +13,119 @@ using System.IO;
 
 namespace MVCHomework1.Controllers
 {
-    public class 客戶聯絡人Controller : Controller
+    public class 客戶聯絡人Controller : BaseController
     {
         //private 客戶資料Entities db = new 客戶資料Entities();
         private 客戶聯絡人Repository _客戶聯絡人Repository = RepositoryHelper.Get客戶聯絡人Repository();
         private 客戶資料Repository _客戶資料Repository = RepositoryHelper.Get客戶資料Repository();
 
-        // GET: 客戶聯絡人
-        public ActionResult Index()
+        public ActionResult Index(string sortOrder = "", string keyword = "")
         {
-            var 客戶聯絡人 = _客戶聯絡人Repository.All();
+            ViewBag.Keyword = keyword;
+            var 客戶聯絡人 = _客戶聯絡人Repository.All().OrderBy(p => p.姓名).AsQueryable();
 
-            return View(客戶聯絡人.ToList());
+            //客戶職稱
+            List<string> 客戶職稱List = 客戶聯絡人.Select(p => p.職稱).Distinct().ToList();
+            List<SelectListItem> items = new List<SelectListItem>();
+            foreach (var item in 客戶職稱List)
+            {
+                items.Add(new SelectListItem()
+                {
+                    Text = item,
+                    Value = item,
+                    Selected = item == keyword ? true : false
+                });
+            }
+
+            items.Insert(0, new SelectListItem() { Value = "", Text = "全部", Selected = keyword == "" ? true : false });
+            ViewBag.職稱List = new SelectList(items,"Value", "Text");
+
+            if (!string.IsNullOrEmpty(keyword))
+            {
+                客戶聯絡人 = _客戶聯絡人Repository.SearchAll(keyword);
+            }
+
+
+            if (!string.IsNullOrEmpty(sortOrder))
+            {
+                string name = sortOrder.Split('_')[0];
+                string order = sortOrder.Split('_')[1];
+
+                if (order == "ASC")
+                {
+                    order = "DESC";
+                    ViewBag.SortOrder = "DESC";
+                }
+                else
+                {
+                    order = "ASC";
+                    ViewBag.SortOrder = "ASC";
+                }
+
+                switch (name)
+                {
+                    case "職稱":
+                        客戶聯絡人 = order == "ASC" ? 客戶聯絡人.OrderBy(p => p.職稱) : 客戶聯絡人.OrderByDescending(p => p.職稱);
+                        break;
+                    case "姓名":
+                        客戶聯絡人 = order == "ASC" ? 客戶聯絡人.OrderBy(p => p.姓名) : 客戶聯絡人.OrderByDescending(p => p.姓名);
+                        break;
+                    case "Email":
+                        客戶聯絡人 = order == "ASC" ? 客戶聯絡人.OrderBy(p => p.Email) : 客戶聯絡人.OrderByDescending(p => p.Email);
+                        break;
+                    case "手機":
+                        客戶聯絡人 = order == "ASC" ? 客戶聯絡人.OrderBy(p => p.手機) : 客戶聯絡人.OrderByDescending(p => p.手機);
+                        break;
+                    case "電話":
+                        客戶聯絡人 = order == "ASC" ? 客戶聯絡人.OrderBy(p => p.電話) : 客戶聯絡人.OrderByDescending(p => p.電話);
+                        break;
+                    case "客戶名稱":
+                        客戶聯絡人 = order == "ASC" ? 客戶聯絡人.OrderBy(p => p.客戶資料.客戶名稱) : 客戶聯絡人.OrderByDescending(p => p.客戶資料.客戶名稱);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            else
+            {
+                //客戶聯絡人 = _客戶聯絡人Repository.All().OrderBy(p => p.姓名);
+                ViewBag.SortOrder = "ASC";
+                ViewBag.Keyword = "";
+                //return View(客戶聯絡人.ToList());
+            }
+
+           
+            //ViewBag.職稱List = 客戶職稱List;
+
+            if (HttpContext.Request.IsAjaxRequest())
+            {
+                return PartialView("_IndexPartialView", 客戶聯絡人.ToList());
+                //return Json(客戶聯絡人.ToList(), JsonRequestBehavior.AllowGet);
+                //return View(客戶聯絡人.ToList());
+            }
+            else
+            {
+                return View(客戶聯絡人.ToList());
+            }
+
+
         }
+
+        // GET: 客戶聯絡人
+        //public ActionResult Index()
+        //{
+        //    var 客戶聯絡人 = _客戶聯絡人Repository.All().OrderBy(p => p.姓名);
+            
+        //}
 
         [HttpPost]
         public ActionResult Index(string keyword)
         {
             var 客戶聯絡人 = _客戶聯絡人Repository.SearchAll(keyword);
+            ViewBag.Keyword = keyword;
+
+            var 客戶職稱List = 客戶聯絡人.Select(p => p.職稱).Distinct();
+            ViewBag.職稱List = new SelectList(客戶職稱List);
 
             return View(客戶聯絡人.ToList());
         }

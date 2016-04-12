@@ -185,6 +185,8 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\BaseController.cs" />
+    <Compile Include="Controllers\CalcActionTimespanAttribute.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\客戶聯絡人Controller.cs" />
@@ -221,6 +223,7 @@
     <Compile Include="Models\RepositoryIQueryableExtensions.cs">
       <DependentUpon>IRepository.EF6.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\SortViewModel.cs" />
     <Compile Include="Models\VW_客戶聯絡人帳戶數量.cs">
       <DependentUpon>客戶資料.tt</DependentUpon>
     </Compile>
@@ -376,6 +379,7 @@
     <Content Include="Views\客戶資料\客戶聯絡人銀行帳戶數量.cshtml" />
     <Content Include="Views\Shared\_IndexPartial.cshtml" />
     <Content Include="Views\Shared\_ExportToExcelPartial.cshtml" />
+    <Content Include="Views\客戶聯絡人\_IndexPartialView.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

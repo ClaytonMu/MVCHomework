@@ -13,18 +13,75 @@ using System.IO;
 
 namespace MVCHomework1.Controllers
 {
-    public class 客戶銀行資訊Controller : Controller
+    public class 客戶銀行資訊Controller : BaseController
     {
         //private 客戶資料Entities db = new 客戶資料Entities();
         private 客戶銀行資訊Repository _客戶銀行資訊Repository = RepositoryHelper.Get客戶銀行資訊Repository();
         private 客戶資料Repository _客戶資料Repository = RepositoryHelper.Get客戶資料Repository();
 
         // GET: 客戶銀行資訊
-        public ActionResult Index()
+        public ActionResult Index(string sortOrder = "", string keyword = "")
         {
-            var 客戶銀行資訊 = _客戶銀行資訊Repository.All();
+            var 客戶銀行資訊 = _客戶銀行資訊Repository.All().OrderBy(p => p.帳戶名稱).AsQueryable();
+
+            if (!string.IsNullOrEmpty(keyword))
+            {
+                客戶銀行資訊 = _客戶銀行資訊Repository.SearchAll(keyword);
+            }
+
+
+            if (!string.IsNullOrEmpty(sortOrder))
+            {
+                string name = sortOrder.Split('_')[0];
+                string order = sortOrder.Split('_')[1];
+
+                if (order == "ASC")
+                {
+                    order = "DESC";
+                    ViewBag.SortOrder = "DESC";
+                }
+                else
+                {
+                    order = "ASC";
+                    ViewBag.SortOrder = "ASC";
+                }
+
+                switch (name)
+                {
+                    case "銀行名稱":
+                        客戶銀行資訊 = order == "ASC" ? 客戶銀行資訊.OrderBy(p => p.銀行名稱) : 客戶銀行資訊.OrderByDescending(p => p.銀行名稱);
+                        break;
+                    case "銀行代碼":
+                        客戶銀行資訊 = order == "ASC" ? 客戶銀行資訊.OrderBy(p => p.銀行代碼) : 客戶銀行資訊.OrderByDescending(p => p.銀行代碼);
+                        break;
+                    case "分行代碼":
+                        客戶銀行資訊 = order == "ASC" ? 客戶銀行資訊.OrderBy(p => p.分行代碼) : 客戶銀行資訊.OrderByDescending(p => p.分行代碼);
+                        break;
+                    case "帳戶名稱":
+                        客戶銀行資訊 = order == "ASC" ? 客戶銀行資訊.OrderBy(p => p.帳戶名稱) : 客戶銀行資訊.OrderByDescending(p => p.帳戶名稱);
+                        break;
+                    case "帳戶號碼":
+                        客戶銀行資訊 = order == "ASC" ? 客戶銀行資訊.OrderBy(p => p.帳戶號碼) : 客戶銀行資訊.OrderByDescending(p => p.帳戶號碼);
+                        break;
+                    case "客戶名稱":
+                        客戶銀行資訊 = order == "ASC" ? 客戶銀行資訊.OrderBy(p => p.客戶資料.客戶名稱) : 客戶銀行資訊.OrderByDescending(p => p.客戶資料.客戶名稱);
+                        break;
+                    default:
+                        break;
+                }
+            }
+            else
+            {
+                //客戶聯絡人 = _客戶聯絡人Repository.All().OrderBy(p => p.姓名);
+                ViewBag.SortOrder = "ASC";
+                ViewBag.Keyword = "";
+                //return View(客戶聯絡人.ToList());
+            }
 
             return View(客戶銀行資訊.ToList());
+
+
+            
         }
 
         [HttpPost]

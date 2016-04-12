@@ -5,11 +5,10 @@
 }
 
 @{
-    var data = Model.ToArray();
+    var 客戶聯絡人 = Model.ToArray();
 }
 
-@using (Html.BeginForm("EditPartial", "客戶資料"))
-{
+
     <table class="table">
         <tr>
             <th>
@@ -29,31 +28,35 @@
             </th>
         </tr>
 
-        @for (int i = 0; i < data.Length; i++)
+        @for (int i = 0; i < 客戶聯絡人.Length; i++)
         {
-            @Html.HiddenFor(modelItem => data[i].Id)
+
+            @Html.HiddenFor(modelItem => 客戶聯絡人[i].Id)
+            @Html.HiddenFor(modelItem => 客戶聯絡人[i].姓名)
+            @Html.HiddenFor(modelItem => 客戶聯絡人[i].Email)
+            @Html.HiddenFor(modelItem => 客戶聯絡人[i].是否已刪除)
             <tr>
                 <td>
-                    @Html.EditorFor(modelItem => data[i].職稱)<br />
-                    @Html.ValidationMessageFor(modelItem => data[i].職稱, "", new { @class = "text-danger" })
+                    @Html.EditorFor(modelItem => 客戶聯絡人[i].職稱)<br />
+                    @Html.ValidationMessageFor(modelItem => 客戶聯絡人[i].職稱, "", new { @class = "text-danger" })
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => data[i].姓名)
+                    @Html.DisplayFor(modelItem => 客戶聯絡人[i].姓名)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => data[i].Email)
+                    @Html.DisplayFor(modelItem => 客戶聯絡人[i].Email)
                 </td>
                 <td>
-                    @Html.EditorFor(modelItem => data[i].手機)<br />
-                    @Html.ValidationMessageFor(modelItem => data[i].手機, "", new { @class = "text-danger" })
+                    @Html.EditorFor(modelItem => 客戶聯絡人[i].手機)<br />
+                    @Html.ValidationMessageFor(modelItem => 客戶聯絡人[i].手機, "", new { @class = "text-danger" })
                 </td>
                 <td>
-                    @Html.EditorFor(modelItem => data[i].電話)<br />
-                    @Html.ValidationMessageFor(modelItem => data[i].電話, "", new { @class = "text-danger" })
+                    @Html.EditorFor(modelItem => 客戶聯絡人[i].電話)<br />
+                    @Html.ValidationMessageFor(modelItem => 客戶聯絡人[i].電話, "", new { @class = "text-danger" })
                 </td>
             </tr>
         }
     </table>
-    <input type="submit" value="Save" class="btn btn-default" />
-}
+    
+
 

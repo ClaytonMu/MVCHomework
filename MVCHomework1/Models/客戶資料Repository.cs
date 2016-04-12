@@ -40,9 +40,13 @@ namespace MVCHomework1.Models
 
         public override IQueryable<客戶資料> All()
         {
+            //var a = base.All().Include(p => p.客戶聯絡人).Include(p => p.客戶銀行資訊);
+
             base.All().Where(客 => 客.是否已刪除 == false).ToList().ForEach(
                     客 => { 客.客戶類別 = ((客戶類別)Enum.Parse(typeof(客戶類別), 客.客戶類別)).ToString(); }
                 );
+
+
 
             return base.All().Where(客 => 客.是否已刪除 == false);
         }
