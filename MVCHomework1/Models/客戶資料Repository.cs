@@ -11,6 +11,8 @@ namespace MVCHomework1.Models
 {   
 	public  class 客戶資料Repository : EFRepository<客戶資料>, I客戶資料Repository
 	{
+        private Utility _utility = new Utility();
+
         public enum 客戶類別
         {
             無,
@@ -51,7 +53,7 @@ namespace MVCHomework1.Models
             return base.All().Where(客 => 客.是否已刪除 == false);
         }
 
-        public IQueryable<客戶資料> SearchAll(string keyword)
+        public IQueryable<客戶資料> SearchKeyword(string keyword)
         {
             return this.All().Where(客 =>
                 客.客戶名稱.Contains(keyword) ||
@@ -63,6 +65,52 @@ namespace MVCHomework1.Models
                 客.客戶類別.Contains(keyword));
         }
 
+        public IQueryable<客戶資料> Sort(SortViewModel sortModel)
+        {
+            IQueryable<客戶資料> 客戶資料 = null;
+            if (!string.IsNullOrEmpty(sortModel.keyword))
+            {
+                客戶資料 = this.SearchKeyword(sortModel.keyword);
+            }
+            else
+            {
+                客戶資料 = this.All();
+            }
+
+            if (!string.IsNullOrEmpty(sortModel.sortOrder))
+            {
+                string order = (sortModel.sortOrder == "ASC") ? "DESC" : "ASC";
+                switch (sortModel.sortColumn)
+                {
+                    
+                    case "統一編號":
+                        客戶資料 = order == "ASC" ? 客戶資料.OrderBy(p => p.統一編號) : 客戶資料.OrderByDescending(p => p.統一編號);
+                        break;
+                    case "電話":
+                        客戶資料 = order == "ASC" ? 客戶資料.OrderBy(p => p.電話) : 客戶資料.OrderByDescending(p => p.電話);
+                        break;
+                    case "傳真":
+                        客戶資料 = order == "ASC" ? 客戶資料.OrderBy(p => p.傳真) : 客戶資料.OrderByDescending(p => p.傳真);
+                        break;
+                    case "地址":
+                        客戶資料 = order == "ASC" ? 客戶資料.OrderBy(p => p.地址) : 客戶資料.OrderByDescending(p => p.地址);
+                        break;
+                    case "Email":
+                        客戶資料 = order == "ASC" ? 客戶資料.OrderBy(p => p.Email) : 客戶資料.OrderByDescending(p => p.Email);
+                        break;
+                    case "客戶類別":
+                        客戶資料 = order == "ASC" ? 客戶資料.OrderBy(p => p.客戶類別) : 客戶資料.OrderByDescending(p => p.客戶類別);
+                        break;
+                    case "客戶名稱":
+                    default:
+                        客戶資料 = order == "ASC" ? 客戶資料.OrderBy(p => p.客戶名稱) : 客戶資料.OrderByDescending(p => p.客戶名稱);
+                        break;
+                }
+            }
+
+            return 客戶資料;
+        }
+
         public override void Delete(客戶資料 entity)
         {
             entity.是否已刪除 = true;
@@ -70,7 +118,7 @@ namespace MVCHomework1.Models
             entity.客戶銀行資訊.Where(客 => 客.客戶Id == entity.Id)?.ToList().ForEach(客 => { 客.是否已刪除 = true; });
         }
 
-        public byte[] ExportToExcel()
+        public byte[] Export(IList<客戶資料> 客戶資料)
         {
             DataTable dt = new DataTable();
             dt.Columns.Add("客戶名稱");
@@ -81,7 +129,7 @@ namespace MVCHomework1.Models
             dt.Columns.Add("Email");
             dt.Columns.Add("客戶類別");
 
-            this.All().ToList().ForEach(p => {
+            客戶資料.ToList().ForEach(p => {
 
                 DataRow dr = dt.NewRow();
                 dr["客戶名稱"] = p.客戶名稱;
@@ -94,43 +142,7 @@ namespace MVCHomework1.Models
                 dt.Rows.Add(dr);
             });
 
-            //建立Excel 2003檔案
-            IWorkbook wb = new HSSFWorkbook();
-            ISheet ws;
-
-            ////建立Excel 2007檔案
-            //IWorkbook wb = new XSSFWorkbook();
-            //ISheet ws;
-
-            if (dt.TableName != string.Empty)
-            {
-                ws = wb.CreateSheet(dt.TableName);
-            }
-            else
-            {
-                ws = wb.CreateSheet("Sheet1");
-            }
-
-            ws.CreateRow(0);//第一行為欄位名稱
-            for (int i = 0; i < dt.Columns.Count; i++)
-            {
-                ws.GetRow(0).CreateCell(i).SetCellValue(dt.Columns[i].ColumnName);
-            }
-
-            for (int i = 0; i < dt.Rows.Count; i++)
-            {
-                ws.CreateRow(i + 1);
-                for (int j = 0; j < dt.Columns.Count; j++)
-                {
-                    ws.GetRow(i + 1).CreateCell(j).SetCellValue(dt.Rows[i][j].ToString());
-                }
-            }
-
-            MemoryStream MS = new MemoryStream();
-            wb.Write(MS);
-            MS.Close();
-            MS.Dispose();
-            return MS.ToArray();
+            return _utility.Export(dt);
         }
     }
 

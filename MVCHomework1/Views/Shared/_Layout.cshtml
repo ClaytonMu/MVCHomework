@@ -23,12 +23,19 @@
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
                     <li>@Html.ActionLink("首頁", "Index", "Home")</li>
-                    <li>@Html.ActionLink("關於", "About", "Home")</li>
-                    <li>@Html.ActionLink("連絡方式", "Contact", "Home")</li>
-                    <li>@Html.ActionLink("客戶資料", "Index", "客戶資料")</li>
-                    <li>@Html.ActionLink("客戶聯絡人", "Index", "客戶聯絡人")</li>
-                    <li>@Html.ActionLink("客戶銀行資訊", "Index", "客戶銀行資訊")</li>
-                    <li>@Html.ActionLink("客戶聯絡人與銀行帳戶數量", "客戶聯絡人銀行帳戶數量", "客戶資料")</li>
+                    @if (User.IsInRole("admin"))
+                    {
+                        <li>@Html.ActionLink("關於", "About", "Home")</li>
+                        <li>@Html.ActionLink("連絡方式", "Contact", "Home")</li>
+                        <li>@Html.ActionLink("客戶資料", "Index", "客戶資料")</li>
+                        <li>@Html.ActionLink("客戶聯絡人", "Index", "客戶聯絡人")</li>
+                        <li>@Html.ActionLink("客戶銀行資訊", "Index", "客戶銀行資訊")</li>
+                        <li>@Html.ActionLink("客戶聯絡人與銀行帳戶數量", "客戶聯絡人銀行帳戶數量", "客戶資料")</li>
+                    }
+                    else if(User.IsInRole("customer"))
+                    {
+                        <li>@Html.ActionLink("修改客戶資料", "EditProfile", "Account")</li>
+                    }
                 </ul>
                 @Html.Partial("_LoginPartial")
             </div>

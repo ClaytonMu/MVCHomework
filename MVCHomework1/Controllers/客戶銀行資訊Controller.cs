@@ -10,6 +10,7 @@ using MVCHomework1.Models;
 using NPOI.SS.UserModel;
 using NPOI.HSSF.UserModel;
 using System.IO;
+using PagedList;
 
 namespace MVCHomework1.Controllers
 {
@@ -20,136 +21,20 @@ namespace MVCHomework1.Controllers
         private 客戶資料Repository _客戶資料Repository = RepositoryHelper.Get客戶資料Repository();
 
         // GET: 客戶銀行資訊
-        public ActionResult Index(string sortOrder = "", string keyword = "")
+        public ActionResult Index(SortViewModel viewModel)
         {
-            var 客戶銀行資訊 = _客戶銀行資訊Repository.All().OrderBy(p => p.帳戶名稱).AsQueryable();
+            ViewBag.Keyword = viewModel.keyword;
+            ViewBag.sortOrder = (viewModel.sortOrder == "ASC") ? "DESC" : "ASC";
 
-            if (!string.IsNullOrEmpty(keyword))
-            {
-                客戶銀行資訊 = _客戶銀行資訊Repository.SearchAll(keyword);
-            }
-
-
-            if (!string.IsNullOrEmpty(sortOrder))
-            {
-                string name = sortOrder.Split('_')[0];
-                string order = sortOrder.Split('_')[1];
-
-                if (order == "ASC")
-                {
-                    order = "DESC";
-                    ViewBag.SortOrder = "DESC";
-                }
-                else
-                {
-                    order = "ASC";
-                    ViewBag.SortOrder = "ASC";
-                }
-
-                switch (name)
-                {
-                    case "銀行名稱":
-                        客戶銀行資訊 = order == "ASC" ? 客戶銀行資訊.OrderBy(p => p.銀行名稱) : 客戶銀行資訊.OrderByDescending(p => p.銀行名稱);
-                        break;
-                    case "銀行代碼":
-                        客戶銀行資訊 = order == "ASC" ? 客戶銀行資訊.OrderBy(p => p.銀行代碼) : 客戶銀行資訊.OrderByDescending(p => p.銀行代碼);
-                        break;
-                    case "分行代碼":
-                        客戶銀行資訊 = order == "ASC" ? 客戶銀行資訊.OrderBy(p => p.分行代碼) : 客戶銀行資訊.OrderByDescending(p => p.分行代碼);
-                        break;
-                    case "帳戶名稱":
-                        客戶銀行資訊 = order == "ASC" ? 客戶銀行資訊.OrderBy(p => p.帳戶名稱) : 客戶銀行資訊.OrderByDescending(p => p.帳戶名稱);
-                        break;
-                    case "帳戶號碼":
-                        客戶銀行資訊 = order == "ASC" ? 客戶銀行資訊.OrderBy(p => p.帳戶號碼) : 客戶銀行資訊.OrderByDescending(p => p.帳戶號碼);
-                        break;
-                    case "客戶名稱":
-                        客戶銀行資訊 = order == "ASC" ? 客戶銀行資訊.OrderBy(p => p.客戶資料.客戶名稱) : 客戶銀行資訊.OrderByDescending(p => p.客戶資料.客戶名稱);
-                        break;
-                    default:
-                        break;
-                }
-            }
-            else
-            {
-                //客戶聯絡人 = _客戶聯絡人Repository.All().OrderBy(p => p.姓名);
-                ViewBag.SortOrder = "ASC";
-                ViewBag.Keyword = "";
-                //return View(客戶聯絡人.ToList());
-            }
-
-            return View(客戶銀行資訊.ToList());
-
-
-            
+            var 客戶銀行資訊 = _客戶銀行資訊Repository.Sort(viewModel);
+            var data = 客戶銀行資訊.ToPagedList(viewModel.page, 5);
+            return View(data);
         }
 
-        [HttpPost]
-        public ActionResult Index(string keyword)
+        public ActionResult Export(SortViewModel viewModel)
         {
-            var 客戶銀行資訊 = _客戶銀行資訊Repository.SearchAll(keyword);
-
-            return View(客戶銀行資訊.ToList());
-        }
-
-        public ActionResult ExportToExcel()
-        {
-            DataTable dt = new DataTable();
-            dt.Columns.Add("銀行名稱");
-            dt.Columns.Add("銀行代碼");
-            dt.Columns.Add("分行代碼");
-            dt.Columns.Add("帳戶名稱");
-            dt.Columns.Add("帳戶號碼");
-            dt.Columns.Add("客戶名稱");
-
-            _客戶銀行資訊Repository.All().ToList().ForEach(p => {
-                DataRow dr = dt.NewRow();
-                dr["銀行名稱"] = p.銀行名稱;
-                dr["銀行代碼"] = p.銀行代碼;
-                dr["分行代碼"] = p.分行代碼;
-                dr["帳戶名稱"] = p.帳戶名稱;
-                dr["帳戶號碼"] = p.帳戶號碼;
-                dr["客戶名稱"] = p.客戶資料.客戶名稱;
-                dt.Rows.Add(dr);
-            });
-
-            //建立Excel 2003檔案
-            IWorkbook wb = new HSSFWorkbook();
-            ISheet ws;
-
-            ////建立Excel 2007檔案
-            //IWorkbook wb = new XSSFWorkbook();
-            //ISheet ws;
-
-            if (dt.TableName != string.Empty)
-            {
-                ws = wb.CreateSheet(dt.TableName);
-            }
-            else
-            {
-                ws = wb.CreateSheet("Sheet1");
-            }
-
-            ws.CreateRow(0);//第一行為欄位名稱
-            for (int i = 0; i < dt.Columns.Count; i++)
-            {
-                ws.GetRow(0).CreateCell(i).SetCellValue(dt.Columns[i].ColumnName);
-            }
-
-            for (int i = 0; i < dt.Rows.Count; i++)
-            {
-                ws.CreateRow(i + 1);
-                for (int j = 0; j < dt.Columns.Count; j++)
-                {
-                    ws.GetRow(i + 1).CreateCell(j).SetCellValue(dt.Rows[i][j].ToString());
-                }
-            }
-
-            MemoryStream MS = new MemoryStream();
-            wb.Write(MS);
-            MS.Close();
-            MS.Dispose();
-            return File(MS.ToArray(), "application/vnd.ms-excel", "Download.xls");
+            var 客戶銀行資訊 = _客戶銀行資訊Repository.Sort(viewModel);
+            return File(_客戶銀行資訊Repository.Export(客戶銀行資訊.ToList()), "application/vnd.ms-excel", "Download.xls");
         }
 
         // GET: 客戶銀行資訊/Details/5

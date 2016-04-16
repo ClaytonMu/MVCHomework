@@ -13,6 +13,7 @@ using NPOI.XSSF.UserModel;
 using NPOI.SS.UserModel;
 using System.IO;
 using System.Reflection;
+using PagedList;
 
 namespace MVCHomework1.Controllers
 {
@@ -29,81 +30,20 @@ namespace MVCHomework1.Controllers
         }
 
         // GET: 客戶資料
-        public ActionResult Index(string sortOrder = "", string keyword = "")
+        public ActionResult Index(SortViewModel viewModel)
         {
-            var 客戶資料 = _客戶資料Repository.All().OrderBy(p => p.客戶名稱).AsQueryable();
+            ViewBag.Keyword = viewModel.keyword;
+            ViewBag.sortOrder = (viewModel.sortOrder == "ASC") ? "DESC" : "ASC";
 
-            if (!string.IsNullOrEmpty(keyword))
-            {
-                客戶資料 = _客戶資料Repository.SearchAll(keyword);
-            }
-
-
-            if (!string.IsNullOrEmpty(sortOrder))
-            {
-                string name = sortOrder.Split('_')[0];
-                string order = sortOrder.Split('_')[1];
-
-                if (order == "ASC")
-                {
-                    order = "DESC";
-                    ViewBag.SortOrder = "DESC";
-                }
-                else
-                {
-                    order = "ASC";
-                    ViewBag.SortOrder = "ASC";
-                }
-
-                switch (name)
-                {
-                    case "客戶名稱":
-                        客戶資料 = order == "ASC" ? 客戶資料.OrderBy(p => p.客戶名稱) : 客戶資料.OrderByDescending(p => p.客戶名稱);
-                        break;
-                    case "統一編號":
-                        客戶資料 = order == "ASC" ? 客戶資料.OrderBy(p => p.統一編號) : 客戶資料.OrderByDescending(p => p.統一編號);
-                        break;
-                    case "電話":
-                        客戶資料 = order == "ASC" ? 客戶資料.OrderBy(p => p.電話) : 客戶資料.OrderByDescending(p => p.電話);
-                        break;
-                    case "傳真":
-                        客戶資料 = order == "ASC" ? 客戶資料.OrderBy(p => p.傳真) : 客戶資料.OrderByDescending(p => p.傳真);
-                        break;
-                    case "地址":
-                        客戶資料 = order == "ASC" ? 客戶資料.OrderBy(p => p.地址) : 客戶資料.OrderByDescending(p => p.地址);
-                        break;
-                    case "Email":
-                        客戶資料 = order == "ASC" ? 客戶資料.OrderBy(p => p.Email) : 客戶資料.OrderByDescending(p => p.Email);
-                        break;
-                    case "客戶類別":
-                        客戶資料 = order == "ASC" ? 客戶資料.OrderBy(p => p.客戶類別) : 客戶資料.OrderByDescending(p => p.客戶類別);
-                        break;
-                    default:
-                        break;
-                }
-            }
-            else
-            {
-                ViewBag.SortOrder = "ASC";
-                ViewBag.Keyword = "";
-            }
-
-            return View(客戶資料.ToList());
+            var 客戶資料 = _客戶資料Repository.Sort(viewModel);
+            var data = 客戶資料.ToPagedList(viewModel.page, 5);
+            return View(data);
         }
 
-        [HttpPost]
-        public ActionResult Index(string keyword)
+        public ActionResult Export(SortViewModel viewModel)
         {
-            var 客戶資料 = _客戶資料Repository.SearchAll(keyword);
-            ViewBag.Keyword = keyword;
-
-            return View(客戶資料.ToList());
-        }
-
-        public ActionResult ExportToExcel()
-        {
-            byte[] info = _客戶資料Repository.ExportToExcel();
-            return File(info, "application/vnd.ms-excel", "Download.xls");
+            var 客戶資料 = _客戶資料Repository.Sort(viewModel);
+            return File(_客戶資料Repository.Export(客戶資料.ToList()), "application/vnd.ms-excel", "Download.xls");
         }
 
         // GET: 客戶資料/Details/5
@@ -172,7 +112,6 @@ namespace MVCHomework1.Controllers
             {
                 return RedirectToAction("Index");
             }
-            //return PartialView("_IndexPartial", _客戶資料Repository.Find(id));
         }
 
         // GET: 客戶資料/Edit/5
@@ -217,15 +156,6 @@ namespace MVCHomework1.Controllers
                     _客戶資料Repository.UnitOfWork.Commit();
                     return RedirectToAction("Index");
                 }
-
-                
-                //_客戶資料Repository.UnitOfWork.Context.Configuration.LazyLoadingEnabled = false;
-                //_客戶資料Repository.UnitOfWork.Context.Entry(客戶資料).State = EntityState.Modified;
-                //_客戶聯絡人Repository.UnitOfWork.Commit();
-                
-                //_客戶資料Repository.UnitOfWork.Context.Entry(客戶資料).State = EntityState.Modified;
-                //_客戶資料Repository.UnitOfWork.Commit();
-                
             }
 
             ViewBag.類別Id = new SelectList(_客戶資料Repository.所有客戶類別(), "Key", "Value");
