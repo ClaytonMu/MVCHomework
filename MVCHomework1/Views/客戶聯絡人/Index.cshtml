@@ -17,6 +17,30 @@
                 document.form1.submit();
                 return false;
             });
+
+            $("#btnCreate").on("click", function () {
+                location.href = "@Url.Action("Create")";
+            });
+
+            $(".table a").each(function () {
+                var sortOrder = $("#sortOrder").val();
+                var sortColumn = $("#sortColumn").val();
+
+                if (sortOrder == "ASC") {
+                    sortOrder = "↓";
+                }
+                else if (sortOrder == "DESC")
+                    sortOrder = "↑";
+
+                if (sortColumn != "") {
+                    $("table a").each(function () {
+                        var currentColumnName = $(this).text();
+                        if (currentColumnName == sortColumn) {
+                            $(this).text(currentColumnName + sortOrder);
+                        }
+                    });
+                }
+            });
         });
         function Sort(columnName, sortOrder) {
             $("#sortColumn").val(columnName);
@@ -35,16 +59,14 @@
 }
 
 
-<h2>Index</h2>
-
-
-
-@Html.ActionLink("Create New", "Create")
 @using (Html.BeginForm("Index", "客戶聯絡人", FormMethod.Get, new { name = "form1" }))
 {
     <p>
         <table>
             <tr>
+                <td>
+                    <input type="button" id="btnCreate" value="新增" class="btn btn-default">
+                </td>
                 <td>
                     關鍵字:
                 </td>
@@ -115,9 +137,9 @@
                     @Html.DisplayFor(modelItem => item.客戶資料.客戶名稱)
                 </td>
                 <td>
-                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
-                    @Html.ActionLink("Details", "Details", new { id = item.Id }) |
-                    @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                    @Html.ActionLink("編輯", "Edit", new { id = item.Id }) |
+                    @Html.ActionLink("詳細資訊", "Details", new { id = item.Id }) |
+                    @Html.ActionLink("刪除", "Delete", new { id = item.Id })
                 </td>
             </tr>
         }
@@ -126,5 +148,6 @@
 }
 
 
-
-
+@section Index{
+    <li><a href="@Url.Action("Index", "客戶聯絡人")">客戶聯絡人</a></li>
+}

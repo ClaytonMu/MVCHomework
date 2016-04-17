@@ -4,12 +4,45 @@ namespace MVCHomework1.Models
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.ComponentModel.DataAnnotations;
+    using System.Linq;
 
     [MetadataType(typeof(客戶資料MetaData))]
-    public partial class 客戶資料
+    public partial class 客戶資料 : IValidatableObject
     {
+        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+        {
+            客戶資料Entities db = new 客戶資料Entities();
+
+            if (this.Id == default(int))
+            {
+                //新增
+                var count = db.客戶資料.Count(客 =>
+                    客.帳號.ToLower() == this.Email.ToLower() &&
+                    客.是否已刪除 == false
+                );
+
+                if (count > 0)
+                {
+                    yield return new ValidationResult("帳號已存在", new string[] { "帳號" });
+                }
+            }
+            else
+            {
+                var count = db.客戶資料.Count(客 =>
+                    客.帳號.ToLower() == this.帳號.ToLower() &&
+                    客.Id != this.Id &&
+                    客.是否已刪除 == false
+                );
+
+                if (count > 0)
+                {
+                    yield return new ValidationResult("帳號已存在", new string[] { "帳號" });
+                }
+
+            }
+        }
     }
-    
+
     public partial class 客戶資料MetaData
     {
         [Required]
@@ -42,10 +75,8 @@ namespace MVCHomework1.Models
         [StringLength(50, ErrorMessage = "欄位長度不得大於 50 個字元")]
         public string 客戶類別 { get; set; }
 
-        [Required]
         public string 帳號 { get; set; }
 
-        [Required]
         [DataType(DataType.Password)]
         public string 密碼 { get; set; }
 

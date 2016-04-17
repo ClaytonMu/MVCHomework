@@ -4,7 +4,7 @@
     ViewBag.Title = "Edit";
 }
 
-<h2>Edit</h2>
+<h2>編輯</h2>
 
 
 @using (Html.BeginForm())
@@ -12,14 +12,13 @@
     @Html.AntiForgeryToken()
 
     <div class="form-horizontal">
-        <h4>客戶資料</h4>
-        <hr />
         @Html.ValidationSummary(true, "", new { @class = "text-danger" })
         @Html.HiddenFor(model => model.Id)
+        @Html.HiddenFor(model => model.客戶類別)
         <div class="form-group">
-           @Html.LabelFor(model => model.客戶類別, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.客戶類別, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.DropDownList("客戶類別", (SelectList)ViewBag.類別Id, htmlAttributes: new { @class = "form-control" })
+                @Html.DropDownList("客戶類別", null, htmlAttributes: new { @class = "form-control" })
                 @Html.ValidationMessageFor(model => model.客戶類別, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -71,27 +70,37 @@
             </div>
         </div>
 
-        <div>
-            <h4>客戶聯絡人</h4>
-            @Html.Partial("_IndexPartial", Model.客戶聯絡人.Where(p => p.是否已刪除 == false))
+        <div class="form-group">
+            @Html.LabelFor(model => model.帳號, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @if (!string.IsNullOrEmpty(Model.帳號) && !string.IsNullOrEmpty(Model.密碼))
+                {
+                    @Html.DisplayFor(model => model.帳號)
+                }
+                else
+                {
+                    @Html.EditorFor(model => model.帳號, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.帳號, "", new { @class = "text-danger" })
+                }
+            </div>
         </div>
-        <input type="submit" value="Save" class="btn btn-default" />
 
-        
-        
-        
-
-        
+        <input type="submit" value="儲存" class="btn btn-default" />
     </div>
-    
+
 }
 
 
 
 <div>
-    @Html.ActionLink("Back to List", "Index")
+    @Html.ActionLink("回客戶資料列表", "Index")
 </div>
 
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
+}
+
+@section Edit{
+    <li><a href="@Url.Action("Index", "客戶資料")">客戶資料</a></li>
+    <li>編輯</li>
 }

@@ -61,6 +61,7 @@ namespace MVCHomework1.Controllers
             return View();
         }
 
+
         // POST: 客戶聯絡人/Create
         // 若要免於過量張貼攻擊，請啟用想要繫結的特定屬性，如需
         // 詳細資訊，請參閱 http://go.microsoft.com/fwlink/?LinkId=317598。
@@ -94,6 +95,8 @@ namespace MVCHomework1.Controllers
             ViewBag.客戶Id = new SelectList(_客戶資料Repository.All(), "Id", "客戶名稱", 客戶聯絡人.客戶Id);
             return View(客戶聯絡人);
         }
+
+ 
 
         // POST: 客戶聯絡人/Edit/5
         // 若要免於過量張貼攻擊，請啟用想要繫結的特定屬性，如需

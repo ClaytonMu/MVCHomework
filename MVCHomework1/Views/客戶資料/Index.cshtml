@@ -4,12 +4,14 @@
 
 @{
     ViewBag.Title = "Index";
+    
 }
 
 @section scripts
 {
     <script>
         $(function () {
+
             $(".pagination a").on("click", function () {
                 var href = $(this).attr("href");
                 var pid = href.substring(href.indexOf('?page=') + 6);
@@ -17,10 +19,40 @@
                 document.form1.submit();
                 return false;
             });
+
+            $("#btnCreate").on("click", function () {
+                location.href = "@Url.Action("Create")";
+            });
+
+            $("#btnTestError").on("click", function () {
+                location.href = "@Url.Action("TestError")";
+            });
+
+            $(".table a").each(function () {
+                var sortOrder = $("#sortOrder").val();
+                var sortColumn = $("#sortColumn").val();
+
+                if (sortOrder == "ASC") {
+                    sortOrder = "↓";
+                }
+                else if(sortOrder == "DESC")
+                    sortOrder = "↑";
+
+                if (sortColumn != "") {
+                    $("table a").each(function () {
+                        var currentColumnName = $(this).text();
+                        if (currentColumnName == sortColumn) {
+                            $(this).text(currentColumnName + sortOrder);
+                        }
+                    });
+                }
+            });
         });
+
         function Sort(columnName, sortOrder) {
             $("#sortColumn").val(columnName);
             $("#sortOrder").val(sortOrder);
+
             document.form1.submit();
             return false;
         }
@@ -31,19 +63,38 @@
             $("form[name='form1']").attr("action", "客戶資料/Index");
             return false;
         }
+
+        function JsonTest(id) {
+            $.ajax({
+                url: "@Url.Action("JsonTest")",
+                dataType: 'text',
+                data: { id: id },
+                success: function(data, status, xhr) {
+                    alert(data);
+                },
+                error: function(xhr, status, error) {
+                    alert(status);
+                }
+            });
+
+            return false;
+        }
     </script>
 }
 
-<h2>Index</h2>
 
 
-    @Html.ActionLink("Create New", "Create")
-    @Html.ActionLink("測試錯誤自訂", "TestError")
     @using (Html.BeginForm("Index", "客戶資料", FormMethod.Get, new { name = "form1" }))
     {
         <p>
             <table>
                 <tr>
+                    <td>
+                        <input type="button" id="btnTestError" value="測試自訂錯誤" class="btn btn-default">
+                    </td>
+                    <td>
+                        <input type="button" id="btnCreate" value="新增" class="btn btn-default">
+                    </td>
                     <td>
                         關鍵字:
                     </td>
@@ -114,9 +165,10 @@
                         @Html.DisplayFor(modelItem => item.客戶類別)
                     </td>
                     <td>
-                        @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
-                        @Html.ActionLink("Details", "Details", new { id = item.Id }) |
-                        @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                        @Html.ActionLink("編輯", "Edit", new { id = item.Id }) |
+                        @Html.ActionLink("詳細資訊", "Details", new { id = item.Id }) |
+                        @Html.ActionLink("刪除", "Delete", new { id = item.Id }) |
+                        @Html.ActionLink("JSON測試", "",null, new { id = item.Id, onclick=string.Format("return JsonTest('{0}');", item.Id) })
                     </td>
                 </tr>
             }
@@ -126,5 +178,8 @@
         @Html.PagedListPager(Model as IPagedList, p => Url.Action("Index", new { page = p }))
     }
     
+@section Index{
+    <li><a href="@Url.Action("Index", "客戶資料")">客戶資料</a></li>
+}
 
     

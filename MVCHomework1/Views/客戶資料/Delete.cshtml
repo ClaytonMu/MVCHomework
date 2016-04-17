@@ -4,9 +4,9 @@
     ViewBag.Title = "Delete";
 }
 
-<h2>Delete</h2>
+<h2>刪除</h2>
 
-<h3>Are you sure you want to delete this?</h3>
+<h3>確定要刪除該筆資料?</h3>
 <div>
     <h4>客戶資料</h4>
     <hr />
@@ -65,8 +65,13 @@
         @Html.AntiForgeryToken()
 
         <div class="form-actions no-color">
-            <input type="submit" value="Delete" class="btn btn-default" /> |
-            @Html.ActionLink("Back to List", "Index")
+            <input type="submit" value="刪除" class="btn btn-default" /> |
+            @Html.ActionLink("回客戶資料列表", "Index")
         </div>
     }
 </div>
+
+@section Delete{
+    <li><a href="@Url.Action("Index", "客戶資料")">客戶資料</a></li>
+    <li>刪除</li>
+}

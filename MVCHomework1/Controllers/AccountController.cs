@@ -40,7 +40,44 @@ namespace MVCHomework1.Controllers
 
                 if (ValidateLogin(loginData))
                 {
-                    FormsAuthenticationTicket ticket = new FormsAuthenticationTicket(
+                    CreateTicket(loginData);
+                    return RedirectToAction("Index", "Home");
+                }
+                else
+                {
+                    ViewBag.Error = "請確認帳號密碼正確性";
+                }
+            }
+            else
+            {
+                if (ValidateFirstTimeLogin(loginData))
+                {
+                    CreateTicket(loginData);
+                    return RedirectToAction("Index", "Home");
+                }
+            }
+
+
+            return View(loginData);
+        }
+
+
+        private bool ValidateFirstTimeLogin(LoginViewModel loginData)
+        {
+            var loginUser = _客戶repo.All().Where(p => p.帳號 == loginData.Account).FirstOrDefault();
+
+            if (loginUser != null && loginUser.密碼 == null)
+            {
+                userData = "customer";
+                return true;
+            }
+
+            return false;
+        }
+
+        private void CreateTicket(LoginViewModel loginData)
+        {
+            FormsAuthenticationTicket ticket = new FormsAuthenticationTicket(
                         1,
                         loginData.Account,
                         DateTime.Now,
@@ -49,18 +86,8 @@ namespace MVCHomework1.Controllers
                         userData,
                         FormsAuthentication.FormsCookiePath);
 
-                    string encTicket = FormsAuthentication.Encrypt(ticket);
-                    Response.Cookies.Add(new HttpCookie(FormsAuthentication.FormsCookieName, encTicket));
-                    return RedirectToAction("Index", "Home");
-                }
-                else
-                {
-                    ViewBag.Error = "請確認帳號密碼正確性";
-                }
-            }
-
-
-            return View(loginData);
+            string encTicket = FormsAuthentication.Encrypt(ticket);
+            Response.Cookies.Add(new HttpCookie(FormsAuthentication.FormsCookieName, encTicket));
         }
 
         /// <summary>
@@ -84,10 +111,15 @@ namespace MVCHomework1.Controllers
 
                 if (loginUser != null)
                 {
-                    string strPassword = FormsAuthentication.HashPasswordForStoringInConfigFile(loginData.Password, "MD5");
+                    string strPassword = FormsAuthentication.HashPasswordForStoringInConfigFile(loginData.Account + loginData.Password, "MD5");
                     string dbPassword = loginUser.密碼;
 
                     if (strPassword == dbPassword)
+                    {
+                        userData = "customer";
+                        return true;
+                    }
+                    else if (dbPassword == null)
                     {
                         userData = "customer";
                         return true;
@@ -102,7 +134,7 @@ namespace MVCHomework1.Controllers
         public ActionResult Logout()
         {
             FormsAuthentication.SignOut();
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Login");
         }
 
         [Authorize(Roles = "customer")]
@@ -141,7 +173,7 @@ namespace MVCHomework1.Controllers
                 客戶資料.Email = model.Email;
 
                 if(!string.IsNullOrEmpty(model.確認密碼))
-                    客戶資料.密碼 = FormsAuthentication.HashPasswordForStoringInConfigFile(model.確認密碼, "MD5");
+                    客戶資料.密碼 = FormsAuthentication.HashPasswordForStoringInConfigFile(客戶資料.帳號 + model.確認密碼, "MD5");
 
                 _客戶repo.UnitOfWork.Commit();
                 return RedirectToAction("Index", "Home");

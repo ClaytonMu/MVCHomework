@@ -30,9 +30,10 @@
                         <li>@Html.ActionLink("客戶資料", "Index", "客戶資料")</li>
                         <li>@Html.ActionLink("客戶聯絡人", "Index", "客戶聯絡人")</li>
                         <li>@Html.ActionLink("客戶銀行資訊", "Index", "客戶銀行資訊")</li>
-                        <li>@Html.ActionLink("客戶聯絡人與銀行帳戶數量", "客戶聯絡人銀行帳戶數量", "客戶資料")</li>
+                        <li>@Html.ActionLink("聯絡人&銀行帳戶數量", "客戶聯絡人銀行帳戶數量", "客戶資料")</li>
+                        <li>@Html.ActionLink("MVC.Grid", "MVCGrid", "客戶資料")</li>
                     }
-                    else if(User.IsInRole("customer"))
+                    else if (User.IsInRole("customer"))
                     {
                         <li>@Html.ActionLink("修改客戶資料", "EditProfile", "Account")</li>
                     }
@@ -42,6 +43,17 @@
         </div>
     </div>
     <div class="container body-content">
+        <ul class="breadcrumb">
+            <li>
+                <i class="icon-home"></i>
+                <a href="@Url.Action("Index", "Home")">首頁</a>
+                <i class="icon-angle-right"></i>
+            </li>
+            @{ var title = ViewBag.Title;}
+            @RenderSection(title, false)
+
+        </ul>
+
         @RenderBody()
         <hr />
         <footer>
@@ -51,6 +63,7 @@
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/gridmvc")
     @RenderSection("scripts", required: false)
 </body>
 </html>

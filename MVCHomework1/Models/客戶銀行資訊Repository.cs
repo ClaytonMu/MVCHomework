@@ -15,7 +15,7 @@ namespace MVCHomework1.Models
         private Utility _utility = new Utility();
         public 客戶銀行資訊 Find(int id)
         {
-            return this.All().Where(p => p.客戶Id == id).FirstOrDefault();
+            return this.All().Where(p => p.Id == id).FirstOrDefault();
         }
 
         public override IQueryable<客戶銀行資訊> All()
@@ -50,7 +50,7 @@ namespace MVCHomework1.Models
 
             if (!string.IsNullOrEmpty(sortModel.sortOrder))
             {
-                string order = (sortModel.sortOrder == "ASC") ? "DESC" : "ASC";
+                string order = sortModel.sortOrder;
                 switch (sortModel.sortColumn)
                 {
                     

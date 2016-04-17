@@ -4,10 +4,9 @@
     ViewBag.Title = "Details";
 }
 
-<h2>Details</h2>
+<h2>詳細資訊</h2>
 
 <div>
-    <h4>客戶銀行資訊</h4>
     <hr />
     <dl class="dl-horizontal">
         <dt>
@@ -61,6 +60,11 @@
     </dl>
 </div>
 <p>
-    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
-    @Html.ActionLink("Back to List", "Index")
+    @Html.ActionLink("編輯", "Edit", new { id = Model.Id }) |
+    @Html.ActionLink("回客戶銀行資訊列表", "Index")
 </p>
+
+@section Details{
+    <li><a href="@Url.Action("Index", "客戶銀行資訊")">客戶銀行資訊</a></li>
+    <li>詳細資訊</li>
+}

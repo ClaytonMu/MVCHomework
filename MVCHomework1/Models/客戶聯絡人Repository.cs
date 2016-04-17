@@ -56,7 +56,7 @@ namespace MVCHomework1.Models
 
             if (!string.IsNullOrEmpty(sortModel.sortOrder))
             {
-                string order = (sortModel.sortOrder == "ASC") ? "DESC" : "ASC";
+                string order = sortModel.sortOrder;
 
                 switch (sortModel.sortColumn)
                 {

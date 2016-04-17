@@ -27,7 +27,7 @@ namespace MVCHomework1.Models
             foreach (客戶類別 type in Enum.GetValues(typeof(客戶類別)))
             {
                 客戶類別ViewModel m = new 客戶類別ViewModel();
-                m.Key = (int)type;
+                m.Key = type.ToString();
                 m.Value = type.ToString();
                 list.Add(m);
             }
@@ -37,16 +37,16 @@ namespace MVCHomework1.Models
 
         public 客戶資料 Find(int id)
         {
-            return base.All().Where(p => p.Id == id && p.是否已刪除 == false).FirstOrDefault();
+            return this.All().Where(p => p.Id == id && p.是否已刪除 == false).FirstOrDefault();
         }
 
         public override IQueryable<客戶資料> All()
         {
             //var a = base.All().Include(p => p.客戶聯絡人).Include(p => p.客戶銀行資訊);
 
-            base.All().Where(客 => 客.是否已刪除 == false).ToList().ForEach(
-                    客 => { 客.客戶類別 = ((客戶類別)Enum.Parse(typeof(客戶類別), 客.客戶類別)).ToString(); }
-                );
+            //base.All().Where(客 => 客.是否已刪除 == false).ToList().ForEach(
+            //        客 => { 客.客戶類別 = ((客戶類別)Enum.Parse(typeof(客戶類別), 客.客戶類別)).ToString(); }
+            //    );
 
 
 
@@ -79,7 +79,7 @@ namespace MVCHomework1.Models
 
             if (!string.IsNullOrEmpty(sortModel.sortOrder))
             {
-                string order = (sortModel.sortOrder == "ASC") ? "DESC" : "ASC";
+                string order = sortModel.sortOrder;
                 switch (sortModel.sortColumn)
                 {
                     

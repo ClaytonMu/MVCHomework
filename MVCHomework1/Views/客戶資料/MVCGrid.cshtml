@@ -1,0 +1,23 @@
+﻿@model IEnumerable<MVCHomework1.Models.VW_客戶聯絡人帳戶數量>
+@using GridMvc.Html  
+
+@{
+    ViewBag.Title = "MVCGrid";
+}
+
+
+
+<link href="@Url.Content("~/Content/Gridmvc.css")" rel="stylesheet" />
+<link href="@Url.Content("~/Content/bootstrap.min.css")" rel="stylesheet" />
+<script src="@Url.Content("~/Scripts/jquery-1.10.2.min.js")"></script>
+<script src="@Url.Content("~/Scripts/gridmvc.min.js")"></script>
+
+<h2>MVCGrid</h2>
+
+@Html.Grid(Model).Columns(columns =>
+{
+    columns.Add(c => c.客戶名稱).Titled("客戶名稱").Filterable(true);
+    columns.Add(c => c.聯絡人數量).Filterable(true);
+    columns.Add(c => c.銀行帳戶數量).Filterable(true);
+}).WithPaging(10).Sortable(true)  
+
